@@ -1,6 +1,6 @@
 version: "3.4"
 services:
-  app:
+  webapp:
     build:
       context: .
       target: dev
@@ -11,10 +11,16 @@ services:
       - DATABASE_URL
     volumes:
       - .:/app
-  postgres:
+    depends_on:
+      - db
+    links:
+      - db:db
+    command: ['sh', '/webapp/init.sh']
+  db:
     image: postgres:9.6
     volumes:
       - pg-data:/var/lib/postgresql/data
+    container_name: dbtodo
     environment:
       - POSTGRES_DB
       - POSTGRES_USER

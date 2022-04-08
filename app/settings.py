@@ -84,13 +84,12 @@ WSGI_APPLICATION = 'app.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.0/ref/settings/#databases
 
-DATABASES = {
-    'default': {
+#DATABASES = {'default': {}}
+DATABASES =  {'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': BASE_DIR / 'db.sqlite3',
-    }
-}
-
+    }}
+# override with db set in .env
 # Set your database dj_database_url parse env var named DATABASE_URL
 database_info = dj_database_url.config()
 if database_info:
