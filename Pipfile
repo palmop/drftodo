@@ -1,0 +1,22 @@
+[[source]]
+url = "https://pypi.python.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+Django = "*"
+djangorestframework = "*"
+django-environ = "*"
+coverage = "*"
+PyJWT = "*"
+django-filter = "*"
+drf-yasg = "*"
+django-extra-fields = "*"
+psycopg2-binary = "*"
+pillow = "*"
+dj-database-url = "*"
+
+[dev-packages]
+
+[requires]
+python_version = "3.8"
