@@ -11,24 +11,24 @@ from todo.models import Todo
 from todo.pagination import CustomPagination
 
 # CreateAPIViews handle post methods.
-class CreateTodoItemAPIView(CreateAPIView):
+# class CreateTodoItemAPIView(CreateAPIView):
     
-    serializer_class = TodoSerializer
-    permission_classes = (IsAuthenticated,)
+#     serializer_class = TodoSerializer
+#     permission_classes = (IsAuthenticated,)
 
-    # override method perform_create (from mixim create it do a serializer.save())
-    def perform_create(self, serializer):
-        return serializer.save(owner=self.request.user)
+#     # override method perform_create (from mixim create it do a serializer.save())
+#     def perform_create(self, serializer):
+#         return serializer.save(owner=self.request.user)
     
-# ListApiView handle get request for list
-class ListTodoItemsAPIView(ListAPIView):
+# # ListApiView handle get request for list
+# class ListTodoItemsAPIView(ListAPIView):
 
-    serializer_class = TodoSerializer
-    permission_classes = (IsAuthenticated,)
-    #queryset = Todo.objects.all()
+#     serializer_class = TodoSerializer
+#     permission_classes = (IsAuthenticated,)
+#     #queryset = Todo.objects.all()
     
-    def get_queryset(self):
-        return Todo.objects.filter(owner=self.request.user)
+#     def get_queryset(self):
+#         return Todo.objects.filter(owner=self.request.user)
 
 # ListCreateAPIView handle post and get methods:
 class ListCreateTodoItemsAPIView(ListCreateAPIView):

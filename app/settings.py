@@ -9,66 +9,11 @@ https://docs.djangoproject.com/en/4.0/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.0/ref/settings/
 """
+from base64 import encode
 import os
-import dj_database_url
 import environ
-env = environ.Env(DEBUG=(bool, False))
 from pathlib import Path
 from urllib.parse import unquote, urlparse
-
-
-
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
-DATABASES = {}
-BASE_DIR = Path(__file__).resolve().parent.parent
-env_file = os.path.join(BASE_DIR, ".env")
-if os.path.exists(env_file):
-    environ.Env.read_env(env_file)
-    SECRET_KEY = env('SECRET_KEY')
-    DEBUG = env('DEBUG')
-    DATABASE_URL = env('DATABASE_URL')
-    if (DATABASE_URL is not None and 
-        DATABASE_URL != "" and 
-        DATABASE_URL[:9] != "postgres:"):
-            DATABASES =  {
-                'default': {
-                    'ENGINE': 'django.db.backends.sqlite3',
-                    'NAME': {DATABASE_URL},
-                }
-            }
-    else:
-        database_info = dj_database_url.config(env_file)
-        if database_info:
-            DATABASES["default"] = database_info
-else:
-    # with docker-compose the default env variables are declared
-    # in the docke-compose.yml and are overriden in the the env of the 
-    # cloud containers app
-    SECRET_KEY = os.environ.get('SECRET_KEY', '')
-    DEBUG = os.environ.get('DEBUG', '')
-    DATABASE_URL = os.environ.get('DATABASE_URL', '')
-    db_url = urlparse(DATABASE_URL)
-    DB_NAME = db_url.path[1:]  # remove trailing slash
-    # username and password can't contain reserved character, so they should
-    # be percent encoded
-    DB_USER = unquote(db_url.username)
-    DB_PASSWORD = unquote(db_url.password)
-    DB_HOST = db_url.hostname
-    DB_PORT = db_url.port
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.postgresql',
-            'NAME': DB_NAME,
-            'USER': DB_USER,
-            'PASSWORD': DB_PASSWORD,
-            'HOST': DB_HOST,
-            'PORT': DB_PORT,
-        },
-    }
-
-
-
-print(f"DATABASE_URL:{DATABASE_URL}")
 
 ALLOWED_HOSTS = ['*']
 
@@ -120,7 +65,54 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'app.wsgi.application'
 
+# print("START ENVIRONMENT")
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+PROJECT_DIR = BASE_DIR
+env_file = os.path.join(BASE_DIR, ".env")
+# print("env_file: {}".format(env_file))
+if os.path.exists(env_file):
+    environ.Env.read_env(env_file)
+    env = environ.Env()
+    DEBUG = env('DJANGO_DEBUG') == "True"
+    SECRET_KEY = env('SECRET_KEY')
+    DATABASES = {
+        'default': env.db(),
+    }
+else:
+    # with docker-compose the default env variables are declared
+    # in the docke-compose.yml 
+    # .env file is in .gitignore and .dockerignore
+    SECRET_KEY = os.environ.get('SECRET_KEY', '')
+    DEBUG = os.environ.get('DEBUG', True)
+    DATABASE_URL = os.environ.get('DATABASE_URL', '')
+    db_url = urlparse(DATABASE_URL)
+    DB_NAME = db_url.path[1:]  # remove trailing slash
+    # username and password can't contain reserved character, so they should
+    # be percent encoded
+    DB_USER = unquote(db_url.username)
+    DB_PASSWORD = unquote(db_url.password)
+    DB_HOST = db_url.hostname
+    DB_PORT = db_url.port
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': DB_NAME,
+            'USER': DB_USER,
+            'PASSWORD': DB_PASSWORD,
+            'HOST': DB_HOST,
+            'PORT': DB_PORT,
+        },
+    }
 
+
+# Static files (CSS, JavaScript, Images)
+# https://docs.djangoproject.com/en/4.0/howto/static-files/
+
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+MEDIA_FOR_IMAGEFIELD='media'
+MEDIA_ROOT = os.path.join(BASE_DIR, f'{MEDIA_FOR_IMAGEFIELD}/')
+STATIC_URL = '/static/'
+MEDIA_URL = '/media/'
 
 
 
@@ -155,14 +147,6 @@ USE_I18N = True
 USE_TZ = True
 
 
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/4.0/howto/static-files/
-
-STATIC_URL = 'static/'
-MEDIA_URL = '/media/'
-MEDIA_FOR_IMAGEFIELD="media"
-MEDIA_ROOT = os.path.join(BASE_DIR, f'{MEDIA_FOR_IMAGEFIELD}/')
-
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
 
@@ -176,7 +160,7 @@ REST_FRAMEWORK = {
     # ex. ?limit=4&offset=2 like strapi:
     #'DEFAULT_PAGINATION_CLASS': "rest_framework.pagination.LimitOffsetPagination"
 
-    # or :
+    # in order to se a limit we use PageNumerPagination:
     # ex. ?page=2 rif https://www.django-rest-framework.org/api-guide/pagination/
     'DEFAULT_PAGINATION_CLASS': "rest_framework.pagination.PageNumberPagination",
 }

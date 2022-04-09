@@ -50,14 +50,8 @@ class LoginUserApp(GenericAPIView):
         if user:
             serializer=self.serializer_class(user)
             return response.Response(serializer.data, status.HTTP_200_OK)    
-            # redundant status ... is in the http status_code
-            # ret = dict(serializer.data)
-            # ret.update({"status":"OK"})
-            # return response.Response(ret, status.HTTP_200_OK)
 
         return response.Response({'status': 'KO', 'message': 'bad credentials'}, status.HTTP_401_UNAUTHORIZED)
-        # reduntant status ... is in the http status_code
-        # return response.Response({'status': 'KO', 'message': 'bad credentials'}, status.HTTP_401_UNAUTHORIZED)
 
 
 class UserInfo(GenericAPIView):

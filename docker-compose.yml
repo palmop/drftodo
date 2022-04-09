@@ -6,8 +6,8 @@ services:
     ports:
       - 8000:8000
     environment:
-      - SECRET_KEY=qlk4j1l34jknorn
-      - DATABASE_URL=postgres://test:test@dbtodo/test
+      - SECRET_KEY=qweijowqknqwke
+      - DATABASE_URL=psql://test:test@dbtodo:5432/test
       - DEBUG=True
     depends_on:
       - dbtodo
