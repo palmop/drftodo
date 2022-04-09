@@ -8,7 +8,7 @@ services:
     environment:
       - SECRET_KEY=qweijowqknqwke
       - DATABASE_URL=psql://test:test@dbtodo:5432/test
-      - DEBUG=True
+      - DJANGO_DEBUG=True
     depends_on:
       - dbtodo
     links:

@@ -83,7 +83,7 @@ else:
     # in the docke-compose.yml 
     # .env file is in .gitignore and .dockerignore
     SECRET_KEY = os.environ.get('SECRET_KEY', '')
-    DEBUG = os.environ.get('DEBUG', True)
+    DEBUG = os.environ.get('DJANGO_DEBUG', True) == "True"
     DATABASE_URL = os.environ.get('DATABASE_URL', '')
     db_url = urlparse(DATABASE_URL)
     DB_NAME = db_url.path[1:]  # remove trailing slash
