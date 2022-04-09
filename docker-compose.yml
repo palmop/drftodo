@@ -3,29 +3,22 @@ services:
   webapp:
     build:
       context: .
-      target: dev
     ports:
       - 8000:8000
     environment:
-      - DJANGO_SECRET_KEY
-      - DATABASE_URL
-    volumes:
-      - .:/app
+      - SECRET_KEY=qlk4j1l34jknorn
+      - DATABASE_URL=postgres://test:test@dbtodo/test
+      - DEBUG=True
     depends_on:
-      - db
+      - dbtodo
     links:
-      - db:db
-    command: ['sh', '/webapp/init.sh']
-  db:
-    image: postgres:9.6
-    volumes:
-      - pg-data:/var/lib/postgresql/data
+      - dbtodo:dbtodo
+    command: sh init.sh
+  dbtodo:
+    image: postgres:12
     container_name: dbtodo
     environment:
-      - POSTGRES_DB
-      - POSTGRES_USER
-      - POSTGRES_PASSWORD
+      - POSTGRES_DB=test
+      - POSTGRES_USER=test
+      - POSTGRES_PASSWORD=test
 
-volumes:
-  pg-data:
-    driver: local

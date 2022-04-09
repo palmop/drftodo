@@ -9,7 +9,7 @@ class Todo(TrackingModel):
     owner = models.ForeignKey(to=UserApp, on_delete=models.CASCADE)
     name = models.CharField(max_length=255)
     description = models.TextField()
-    image = models.ImageField(upload_to=settings.MEDIA_FOR_IMAGEFIELD)
+    image = models.ImageField(upload_to=settings.MEDIA_FOR_IMAGEFIELD, null=True, blank=True)
     deadline = models.DateField(null=True, blank=True)
     # creationdate came from helpers.models.TrackingModel
     status = models.CharField(

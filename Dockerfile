@@ -1,12 +1,13 @@
-FROM python:3.8 as base
-WORKDIR /webapp
+FROM python:3.8
+
 RUN pip install pipenv
 
-COPY . .
-ENV PYTHONUNBUFFERED=1
+ENV PROJECT_DIR /usr/local/src/webapp
+COPY . ${PROJECT_DIR}/
+WORKDIR ${PROJECT_DIR}
 
-FROM base as dev
-# this is a dev image build, so install dev packages
-RUN pipenv install --system --dev
+RUN pipenv install --system --deploy
+RUN pipfile2req > requirements.txt
+RUN pip install -r requirements.txt
 
-CMD ["./init.sh"]
+EXPOSE 8080

@@ -13,22 +13,62 @@ import os
 import dj_database_url
 import environ
 env = environ.Env(DEBUG=(bool, False))
-
 from pathlib import Path
+from urllib.parse import unquote, urlparse
+
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
+DATABASES = {}
 BASE_DIR = Path(__file__).resolve().parent.parent
+env_file = os.path.join(BASE_DIR, ".env")
+if os.path.exists(env_file):
+    environ.Env.read_env(env_file)
+    SECRET_KEY = env('SECRET_KEY')
+    DEBUG = env('DEBUG')
+    DATABASE_URL = env('DATABASE_URL')
+    if (DATABASE_URL is not None and 
+        DATABASE_URL != "" and 
+        DATABASE_URL[:9] != "postgres:"):
+            DATABASES =  {
+                'default': {
+                    'ENGINE': 'django.db.backends.sqlite3',
+                    'NAME': {DATABASE_URL},
+                }
+            }
+    else:
+        database_info = dj_database_url.config(env_file)
+        if database_info:
+            DATABASES["default"] = database_info
+else:
+    # with docker-compose the default env variables are declared
+    # in the docke-compose.yml and are overriden in the the env of the 
+    # cloud containers app
+    SECRET_KEY = os.environ.get('SECRET_KEY', '')
+    DEBUG = os.environ.get('DEBUG', '')
+    DATABASE_URL = os.environ.get('DATABASE_URL', '')
+    db_url = urlparse(DATABASE_URL)
+    DB_NAME = db_url.path[1:]  # remove trailing slash
+    # username and password can't contain reserved character, so they should
+    # be percent encoded
+    DB_USER = unquote(db_url.username)
+    DB_PASSWORD = unquote(db_url.password)
+    DB_HOST = db_url.hostname
+    DB_PORT = db_url.port
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': DB_NAME,
+            'USER': DB_USER,
+            'PASSWORD': DB_PASSWORD,
+            'HOST': DB_HOST,
+            'PORT': DB_PORT,
+        },
+    }
 
-environ.Env.read_env(env_file=os.path.join(BASE_DIR, ".env"))
 
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/4.0/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-+!xfl#g*@ujen#+&fk2i*)@_=x=sx)@=w)dc5)uf2a@3op^4bl'
-
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+print(f"DATABASE_URL:{DATABASE_URL}")
 
 ALLOWED_HOSTS = ['*']
 
@@ -81,19 +121,7 @@ TEMPLATES = [
 WSGI_APPLICATION = 'app.wsgi.application'
 
 
-# Database
-# https://docs.djangoproject.com/en/4.0/ref/settings/#databases
 
-#DATABASES = {'default': {}}
-DATABASES =  {'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }}
-# override with db set in .env
-# Set your database dj_database_url parse env var named DATABASE_URL
-database_info = dj_database_url.config()
-if database_info:
-    DATABASES["default"] = database_info
 
 
 # Password validation
