@@ -13,16 +13,17 @@ create .env environment:
 
 set **DATABASE_URL** to the value for your database.
 
-than 
+and then 
 
-`pipenv shell`
-`pipenv install`
-`./init.sh`
-
+```
+pipenv install
+pipenv shell
+./init.sh
+```
 
 ## use it
 - docs: http://0.0.0.0:8000/
 - swagger api : http://0.0.0.0:8000/swagger
-- swagger json to import in postman : http://0.0.0.0:8000/swagger
+- swagger json to import in postman : http://0.0.0.0:8000/swagger/swagger.json
 - REST API : http://0.0.0.0:8000/api/todos/
 
